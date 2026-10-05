@@ -30,12 +30,12 @@ function Header() {
           <div className="flex h-9 w-9 items-center justify-center
                           rounded-full bg-blue-600 text-sm font-semibold
                           text-white">
-            A
+            GL
           </div>
 
           <div className="hidden sm:block">
             <p className="text-sm font-semibold text-slate-800">
-              Admin
+              Gopal, Laukik
             </p>
 
             <p className="text-xs text-slate-500">
