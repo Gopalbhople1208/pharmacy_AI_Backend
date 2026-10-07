@@ -28,7 +28,10 @@ ALLOWED_EXTENSIONS = {
     ".jpeg",
     ".txt",
     ".doc",
-    ".docx"
+    ".docx",
+    ".csv",
+    ".xls",
+    ".xlsx"
 }
 
 

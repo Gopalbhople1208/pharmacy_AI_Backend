@@ -1,6 +1,6 @@
-import { useState, useRef } from 'react';
+import { useState, useRef ,useEffect} from 'react';
 import { Database, ChevronDown, Sparkles, Plus, Mic, Send, BarChart2, Package, Truck, Users, FileText, ArrowRight } from 'lucide-react';
-
+import { getHealth, sendChatMessage } from '../services/api';
 import { ClaudeLogo, ChatGPTLogo, GrokLogo, GeminiLogo } from '../components/IntegrationLogos';
 
 const suggestedPrompts = [
@@ -40,6 +40,19 @@ export default function AIAgent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const inputRef = useRef(null);
 
+    useEffect(() => {
+    const testBackend = async () => {
+      try {
+        const data = await getHealth();
+        console.log("Backend connected:", data);
+      } catch (error) {
+        console.error("Backend connection failed:", error);
+      }
+    };
+
+    testBackend();
+  }, []);
+
   const handlePromptClick = (text) => {
     setInputValue(text);
     if (inputRef.current) {
@@ -47,15 +60,20 @@ export default function AIAgent() {
     }
   };
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
+  const handleSend = async () => {
+    const message = inputValue.trim();
+    if (!message) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      alert(`Simulated interaction sent: "${inputValue}"`);
+    try {
+      const result = await sendChatMessage(message);
+      alert(result.ai_response || 'The backend returned no response.');
       setInputValue('');
+    } catch (error) {
+      alert(`Could not send your message: ${error.message}`);
+    } finally {
       setIsSubmitting(false);
-    }, 800);
+    }
   };
 
   const handleKeyDown = (e) => {

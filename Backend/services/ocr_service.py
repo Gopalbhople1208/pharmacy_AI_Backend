@@ -1,4 +1,5 @@
 import os
+import csv
 
 from pypdf import PdfReader
 
@@ -36,6 +37,76 @@ def extract_text(file_path: str) -> str:
             return (
                 f"Text extraction error: {str(error)}"
             )
+
+
+    # -----------------------------------------
+    # CSV
+    # -----------------------------------------
+
+    if extension == ".csv":
+
+        try:
+
+            with open(
+                file_path,
+                "r",
+                encoding="utf-8-sig",
+                newline=""
+            ) as file:
+
+                return "\n".join(
+                    "\t".join(row)
+                    for row in csv.reader(file)
+                )
+
+        except Exception as error:
+
+            return f"CSV extraction error: {str(error)}"
+
+
+    # -----------------------------------------
+    # Excel workbooks
+    # -----------------------------------------
+
+    if extension == ".xlsx":
+
+        try:
+
+            from openpyxl import load_workbook
+
+            workbook = load_workbook(
+                file_path,
+                read_only=True,
+                data_only=True
+            )
+
+            return "\n".join(
+                "\t".join("" if value is None else str(value) for value in row)
+                for sheet in workbook.worksheets
+                for row in sheet.iter_rows(values_only=True)
+            )
+
+        except Exception as error:
+
+            return f"XLSX extraction error: {str(error)}"
+
+    if extension == ".xls":
+
+        try:
+
+            import xlrd
+
+            workbook = xlrd.open_workbook(file_path, on_demand=True)
+
+            return "\n".join(
+                "\t".join(str(value) for value in sheet.row_values(row_index))
+                for sheet in workbook.sheets()
+                for row_index in range(sheet.nrows)
+            )
+
+        except Exception as error:
+
+            return f"XLS extraction error: {str(error)}"
 
 
     # -----------------------------------------

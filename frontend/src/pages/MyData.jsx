@@ -1,12 +1,6 @@
 import { useState, useRef } from 'react';
 import { CloudUpload, Database, Shield, Zap, RefreshCw, FileText, ArrowRight, Eye, Trash2, FileSpreadsheet, Loader2 } from 'lucide-react';
-
-
-
-
-
-
-
+import { uploadDocument } from '../services/api';
 
 
 
@@ -52,7 +46,7 @@ export default function MyData() {
     return true;
   };
 
-  const processFile = (file) => {
+  const processFile = async (file) => {
     if (!validateFile(file)) return;
 
     const newFile = {
@@ -65,19 +59,17 @@ export default function MyData() {
     };
 
     setFiles((prev) => [newFile, ...prev]);
-
-    setTimeout(() => {
-      setFiles((prev) => prev.map((f) => {
-        if (f.id === newFile.id) {
-          return {
-            ...f,
-            status: 'ready',
-            records: Math.floor(Math.random() * 50000) + 1000
-          };
-        }
-        return f;
-      }));
-    }, 3000);
+    try {
+      const result = await uploadDocument(file);
+      setFiles((prev) => prev.map((item) => item.id === newFile.id ? {
+        ...item,
+        status: 'ready',
+        records: result.text_length
+      } : item));
+    } catch (uploadError) {
+      setFiles((prev) => prev.filter((item) => item.id !== newFile.id));
+      setError(uploadError.message);
+    }
   };
 
   const handleDrop = (e) => {
